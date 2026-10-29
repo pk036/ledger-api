@@ -18,7 +18,7 @@ async function createAccount(name: string): Promise<number> {
   return Number(res.json().id);
 }
 
-function transfer(from: number, to: number, amount: number, key = randomUUID()) {
+function transfer(from: number, to: number, amount: number, key: string = randomUUID()) {
   return app.inject({
     method: "POST",
     url: "/transfers",
