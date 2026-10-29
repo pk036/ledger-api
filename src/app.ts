@@ -19,6 +19,21 @@ export function buildApp() {
     reply.send(err);
   });
 
+    app.get("/", async () => ({
+    name: "Ledger API",
+    description:
+      "Double-entry accounting ledger and payments API with idempotency keys and concurrency-safe transfers.",
+    source: "https://github.com/pk036/ledger-api",
+    endpoints: [
+      "GET /health",
+      "POST /accounts",
+      "GET /accounts/:id",
+      "GET /accounts/:id/entries",
+      "POST /transfers (requires Idempotency-Key header)",
+      "GET /reconcile",
+    ],
+  }));
+
   app.get("/health", async () => ({ ok: true }));
 
   const CreateAccount = z.object({
