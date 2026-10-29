@@ -1,3 +1,4 @@
 import { buildApp } from "./app.js";
 
-buildApp().listen({ port: 3000, host: "0.0.0.0" });
+const port = Number(process.env.PORT ?? 3000);
+buildApp().listen({ port, host: "0.0.0.0" });
