@@ -84,5 +84,26 @@ export function buildApp() {
     return rows;
   });
 
+    app.get("/reconcile", async () => {
+    const { rows: [total] } = await pool.query(
+      `SELECT COALESCE(SUM(amount), 0)::text AS sum FROM entries`
+    );
+    const { rows: mismatched } = await pool.query(`
+      SELECT a.id,
+             a.balance AS cached_balance,
+             COALESCE(SUM(e.amount), 0)::text AS computed_balance
+      FROM accounts a
+      LEFT JOIN entries e ON e.account_id = a.id
+      GROUP BY a.id, a.balance
+      HAVING a.balance <> COALESCE(SUM(e.amount), 0)
+      ORDER BY a.id
+    `);
+    return {
+      balanced: total.sum === "0" && mismatched.length === 0,
+      entries_sum: total.sum,
+      mismatched_accounts: mismatched,
+    };
+  });
+
   return app;
 }

@@ -187,3 +187,34 @@ describe("concurrency", () => {
     await expectLedgerConsistent();
   });
 });
+
+describe("reconciliation", () => {
+  it("reports a balanced ledger after transfers", async () => {
+    const alice = await createAccount("Alice");
+    const bob = await createAccount("Bob");
+    await transfer(EXTERNAL, alice, 5000);
+    await transfer(alice, bob, 2000);
+
+    const res = await app.inject({ method: "GET", url: "/reconcile" });
+    expect(res.json()).toMatchObject({
+      balanced: true,
+      entries_sum: "0",
+      mismatched_accounts: [],
+    });
+  });
+
+  it("detects a corrupted cached balance", async () => {
+    const alice = await createAccount("Alice");
+    await transfer(EXTERNAL, alice, 5000);
+
+    // Simulate a bug that changed the balance without writing entries
+    await pool.query(`UPDATE accounts SET balance = 9999 WHERE id = $1`, [alice]);
+
+    const res = await app.inject({ method: "GET", url: "/reconcile" });
+    const body = res.json();
+    expect(body.balanced).toBe(false);
+    expect(body.mismatched_accounts).toEqual([
+      { id: String(alice), cached_balance: "9999", computed_balance: "5000" },
+    ]);
+  });
+});
