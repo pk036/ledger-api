@@ -1,0 +1,35 @@
+{
+  "name": "ledger-api",
+  "version": "1.0.0",
+  "description": "Double-entry accounting ledger and payments API built with TypeScript, Fastify, and PostgreSQL, featuring balanced transactions, idempotency keys, and concurrency-safe transfers.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pk036/ledger-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/pk036/ledger-api/issues"
+  },
+  "homepage": "https://github.com/pk036/ledger-api#readme",
+  "dependencies": {
+    "fastify": "^5.12.7",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
