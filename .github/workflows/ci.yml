@@ -34,4 +34,8 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d --name mongo -p 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+          timeout 90 bash -c 'until docker exec mongo mongosh --quiet --eval "try { rs.status() } catch (e) { rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"localhost:27017\"}]}) }; quit(db.hello().isWritablePrimary ? 0 : 1)"; do sleep 2; done'
       - run: npm test

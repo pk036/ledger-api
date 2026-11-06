@@ -1,11 +1,7 @@
 import type { PoolClient } from "pg";
 import { pool } from "./db.js";
-
-export class LedgerError extends Error {
-  constructor(public statusCode: number, message: string) {
-    super(message);
-  }
-}
+import { LedgerError } from "./errors.js";
+export { LedgerError };
 
 export interface TransferInput {
   fromAccountId: number;
