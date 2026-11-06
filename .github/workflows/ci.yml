@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     services:
       postgres:
@@ -37,6 +37,9 @@ jobs:
       - name: Start MongoDB replica set
         uses: supercharge/mongodb-github-action@1.12.0
         with:
-          mongodb-version: "8.0"
+          mongodb-version: "7.0"
           mongodb-replica-set: rs0
+      - name: Show MongoDB logs on failure
+        if: failure()
+        run: docker logs mongodb || true
       - run: npm test
