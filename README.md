@@ -25,7 +25,7 @@ A double-entry accounting ledger and payments API built with TypeScript, Fastify
 | ---------- | ------------------------------ |
 | Language   | TypeScript (Node.js)           |
 | Framework  | Fastify                        |
-| Database   | PostgreSQL                     |
+| Database   | PostgreSQL, MongoDB (Atlas)    |
 | Validation | Zod                            |
 | Testing    | Vitest                         |
 | DevOps     | Docker Compose, GitHub Actions |
@@ -71,6 +71,20 @@ Every transfer requires an `Idempotency-Key` header. If a client retries a reque
 ### Reconciliation
 
 The `/reconcile` endpoint checks the two invariants a double-entry ledger must never break: all entries across the system sum to zero, and every account's cached balance equals the sum of its entries. Any mismatched accounts are reported with both values.
+
+### MongoDB implementation
+
+The ledger is also implemented on MongoDB (`src/mongo/ledger.ts`) and tested against MongoDB Atlas. The two versions solve the same problems differently:
+
+| Problem             | PostgreSQL                          | MongoDB                                           |
+| ------------------- | ----------------------------------- | ------------------------------------------------- |
+| Atomicity           | `BEGIN` / `COMMIT`                  | Multi-document transactions                       |
+| Overdrafts          | `SELECT ... FOR UPDATE` row locks   | Conditional `$inc` that matches only if funds suffice |
+| Concurrent writes   | Transfers wait for locks            | Write conflicts abort and automatically retry     |
+| Idempotency         | Unique column + `ON CONFLICT`       | Unique index + duplicate-key detection            |
+| Ledger entries      | Separate `entries` table            | Embedded in each transaction document             |
+
+Run the MongoDB tests locally with `npm run test:mongo`, or against Atlas by setting `MONGODB_URI`.
 
 ## Getting Started
 
